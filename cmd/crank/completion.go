@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"strings"
 
-	v1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	"github.com/posener/complete"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -29,25 +28,18 @@ func kubernetesResourcePredictor() complete.PredictFunc {
 		if err != nil {
 			return
 		}
-		resources, err := client.RESTClient().
-			Get().
-			AbsPath("/apis/apiextensions.k8s.io/v1/CustomResourceDefinition").
-			Resource(v1.CompositionKind).
-			DoRaw(context.TODO())
+
+		_, resources, err := client.DiscoveryClient.ServerGroupsAndResources()
 
 		if err != nil {
 			return
 		}
 
-		rl := metav1.APIResourceList{}
-		if err := json.Unmarshal(resources, &rl); err != nil {
-			return
-		}
-
 		var predictions []string
-		for _, res := range rl.APIResources {
-			if strings.HasPrefix(res.Name, a.Last) {
-				predictions = append(predictions, res.Name)
+		for _, res := range resources {
+			fullname := fmt.Sprintf("%s.%s.%s", res.Kind, res.APIVersion, res.GroupVersion)
+			if strings.HasPrefix(fullname, a.Last) {
+				predictions = append(predictions, fullname)
 			}
 		}
 		return predictions
