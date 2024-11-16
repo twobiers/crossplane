@@ -58,7 +58,7 @@ const (
 
 // Cmd builds the trace tree for a Crossplane resource.
 type Cmd struct {
-	Resource string `arg:"" help:"Kind of the Crossplane resource, accepts the 'TYPE[.VERSION][.GROUP][/NAME]' format."`
+	Resource string `arg:"" help:"Kind of the Crossplane resource, accepts the 'TYPE[.VERSION][.GROUP][/NAME]' format." predictor:"k8s_resource"`
 	Name     string `arg:"" help:"Name of the Crossplane resource, can be passed as part of the resource too."          optional:""`
 
 	// TODO(phisco): add support for all the usual kubectl flags; configFlags := genericclioptions.NewConfigFlags(true).AddFlags(...)
