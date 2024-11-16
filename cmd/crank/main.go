@@ -62,7 +62,7 @@ type cli struct {
 	Verbose verboseFlag `help:"Print verbose logging statements." name:"verbose"`
 
 	// Completion
-	InstallCompletions kongplete.InstallCompletions `cmd:"" help:"install shell completions"`
+	Completions kongplete.InstallCompletions `cmd:"" help:"install shell completions"`
 }
 
 func main() {
@@ -79,14 +79,14 @@ func main() {
 			WrapUpperBound: 80,
 		}),
 		kong.UsageOnError())
-	
+
 	kongplete.Complete(parser,
 		kongplete.WithPredictors(CompletionPredictors()),
 	)
 
 	ctx, err := parser.Parse(os.Args[1:])
 	parser.FatalIfErrorf(err)
-	
+
 	err = ctx.Run()
 	ctx.FatalIfErrorf(err)
 }
