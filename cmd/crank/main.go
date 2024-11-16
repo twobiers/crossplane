@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
-	"github.com/posener/complete"
 	"github.com/willabides/kongplete"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -90,12 +89,4 @@ func main() {
 	
 	err = ctx.Run()
 	ctx.FatalIfErrorf(err)
-}
-
-func CompletionPredictors() map[string]complete.Predictor {
-	return map[string]complete.Predictor{
-		"file":             complete.PredictFiles("*"),
-		"directory":        complete.PredictDirs("*"),
-		"file_or_directory": complete.PredictOr(complete.PredictFiles("*"), complete.PredictDirs("*")),
-	}
 }
