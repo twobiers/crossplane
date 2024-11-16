@@ -18,7 +18,11 @@ limitations under the License.
 package main
 
 import (
+	"os"
+
 	"github.com/alecthomas/kong"
+	"github.com/posener/complete"
+	"github.com/willabides/kongplete"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
@@ -57,11 +61,14 @@ type cli struct {
 
 	// Flags.
 	Verbose verboseFlag `help:"Print verbose logging statements." name:"verbose"`
+
+	// Completion
+	InstallCompletions kongplete.InstallCompletions `cmd:"" help:"install shell completions"`
 }
 
 func main() {
 	logger := logging.NewNopLogger()
-	ctx := kong.Parse(&cli{},
+	parser := kong.Must(&cli{},
 		kong.Name("crossplane"),
 		kong.Description("A command line tool for interacting with Crossplane."),
 		// Binding a variable to kong context makes it available to all commands
@@ -73,6 +80,22 @@ func main() {
 			WrapUpperBound: 80,
 		}),
 		kong.UsageOnError())
-	err := ctx.Run()
+	
+	kongplete.Complete(parser,
+		kongplete.WithPredictors(CompletionPredictors()),
+	)
+
+	ctx, err := parser.Parse(os.Args[1:])
+	parser.FatalIfErrorf(err)
+	
+	err = ctx.Run()
 	ctx.FatalIfErrorf(err)
+}
+
+func CompletionPredictors() map[string]complete.Predictor {
+	return map[string]complete.Predictor{
+		"file":             complete.PredictFiles("*"),
+		"directory":        complete.PredictDirs("*"),
+		"file_or_directory": complete.PredictOr(complete.PredictFiles("*"), complete.PredictDirs("*")),
+	}
 }

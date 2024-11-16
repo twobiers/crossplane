@@ -34,10 +34,10 @@ import (
 // Cmd arguments and flags for convert deployment-runtime subcommand.
 type Cmd struct {
 	// Arguments.
-	InputFile string `arg:"" default:"-" help:"The ControllerConfig file to be Converted. If not specified or '-', stdin will be used." optional:"" type:"path"`
+	InputFile string `arg:"" default:"-" help:"The ControllerConfig file to be Converted. If not specified or '-', stdin will be used." optional:"" type:"path" predictor:"file"`
 
 	// Flags.
-	OutputFile string `help:"The file to write the generated DeploymentRuntimeConfig to. If not specified, stdout will be used." placeholder:"PATH" short:"o" type:"path"`
+	OutputFile string `help:"The file to write the generated DeploymentRuntimeConfig to. If not specified, stdout will be used." placeholder:"PATH" short:"o" type:"path" predictor:"file"`
 
 	fs afero.Fs
 }
